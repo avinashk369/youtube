@@ -4,7 +4,6 @@ import 'package:youtube/blocs/employee/employeebloc.dart';
 import 'package:youtube/blocs/navigation/navigation.bloc.dart';
 import 'package:youtube/models/navigation/navigation.items.dart';
 import 'package:youtube/repository/employee_repositoryImpl.dart';
-import 'package:youtube/utils/theme_constants.dart';
 
 class NavigationDemo extends StatelessWidget {
   const NavigationDemo({Key? key}) : super(key: key);
@@ -20,12 +19,15 @@ class NavigationDemo extends StatelessWidget {
           create: (context) => EmployeeBloc(
             context.read<EmployeeRepositoryImpl>(),
           )..add(
-              const LoadEmployees(),
+              const LoadEmployees(
+                limit: 10,
+                page: 1,
+              ),
             ),
         ),
       ],
       child: Scaffold(
-        extendBody: true,
+        //extendBody: true,
         body: BlocBuilder<NavigationBloc, int>(
           builder: (context, state) {
             return IndexedStack(
@@ -41,8 +43,8 @@ class NavigationDemo extends StatelessWidget {
           builder: (context, state) {
             return ClipRRect(
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(15.0),
-                topRight: Radius.circular(15.0),
+                topLeft: Radius.circular(5.0),
+                topRight: Radius.circular(5.0),
               ),
               child: NavigationBarTheme(
                 data: NavigationBarThemeData(
@@ -55,7 +57,7 @@ class NavigationDemo extends StatelessWidget {
                   ),
                 ),
                 child: NavigationBar(
-                  backgroundColor: secondaryLight,
+                  backgroundColor: Colors.grey[100],
                   height: 60,
                   labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
                   selectedIndex: state,

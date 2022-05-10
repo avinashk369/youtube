@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youtube/blocs/employee/employeebloc.dart';
-import 'package:youtube/screens/employee_card.dart';
+import 'package:youtube/routes/route_constants.dart';
+import 'package:youtube/screens/employee/employee_card.dart';
 import 'package:youtube/screens/loading_ui.dart';
 import 'package:youtube/styles/styles.dart';
 import 'package:youtube/utils/theme_constants.dart';
@@ -18,7 +19,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -28,6 +28,7 @@ class _HomeState extends State<Home> {
       appBar: const CustomAppBar(
         title: 'Home',
       ),
+      //added floating action button to apply filter
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryLight,
         onPressed: () {},
@@ -50,7 +51,8 @@ class _HomeState extends State<Home> {
                           itemBuilder: (context, index) => EmployeeCard(
                                 employeeModel: state.employees[index],
                                 onTap: (employeeModel) {
-                                  print(employeeModel.name!);
+                                  Navigator.of(context).pushNamed(empDetail,
+                                      arguments: employeeModel);
                                 },
                               ),
                           itemCount: state.employees.length);

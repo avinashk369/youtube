@@ -46,3 +46,15 @@ class EmployeeDetailLoaded extends EmployeeState {
   // TODO: implement props
   List<Object> get props => [employee];
 }
+
+class EmployeeCheckinsLoaded extends EmployeeState {
+  @override
+  // TODO: implement props
+  final List<EmployeeCheckin> employeeCheckins;
+
+  const EmployeeCheckinsLoaded({required this.employeeCheckins});
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [employeeCheckins];
+}
