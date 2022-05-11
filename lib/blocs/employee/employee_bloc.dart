@@ -12,13 +12,14 @@ part 'employee_state.dart';
 
 class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
   final EmployeeRepositoryImpl _employeeRepositoryImpl;
-  get name => "Avinash kumar dhiraj";
+
   EmployeeBloc(this._employeeRepositoryImpl) : super(EmployeeInitializing()) {
     on<LoadEmployees>((event, emit) => _loadEmployees(event, emit));
     on<LoadEmployeeDetail>((event, emit) => _loadEmployeeDetail(event, emit));
     on<LoadEmployeeCheckins>(
         (event, emit) => _loadEmployeeCheckins(event, emit));
   }
+  int page = 1;
   // load employee checkins
   Future _loadEmployeeCheckins(
       LoadEmployeeCheckins event, Emitter<EmployeeState> emit) async {
@@ -30,10 +31,8 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
         EmployeeCheckinsLoaded(employeeCheckins: employeeCheckins),
       );
     } on ServerError catch (e) {
-      print("object server error ${e.toString()}");
       emit(EmployeeError(message: e.getErrorMessage()));
     } catch (e) {
-      print("object error ${e.toString()}");
       emit(EmployeeError(message: e.toString()));
     }
   }
@@ -42,15 +41,23 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
   Future _loadEmployees(
       LoadEmployees event, Emitter<EmployeeState> emit) async {
     try {
+      final state = this.state;
+
       emit(EmployeeLoading());
       List<EmployeeModel> employees = await _employeeRepositoryImpl
           .loadEmployees(event.page, event.limit, event.name);
-      emit(EmployeeLoaded(employees: employees));
+      if (state is EmployeeLoaded) {
+        emit(
+          EmployeeLoaded(
+            employees: List.from(state.employees)..addAll(employees),
+          ),
+        );
+      } else {
+        emit(EmployeeLoaded(employees: employees));
+      }
     } on ServerError catch (e) {
-      print("object server error ${e.toString()}");
       emit(EmployeeError(message: e.getErrorMessage()));
     } catch (e) {
-      print("object error ${e.toString()}");
       emit(EmployeeError(message: e.toString()));
     }
   }
@@ -65,10 +72,8 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
 
       emit(EmployeeDetailLoaded(employee: employeeModel));
     } on ServerError catch (e) {
-      print("object server error ${e.getErrorMessage()}");
       emit(EmployeeError(message: e.getErrorMessage()));
     } catch (e) {
-      print("object error ${e.toString()}");
       emit(EmployeeError(message: e.toString()));
     }
   }

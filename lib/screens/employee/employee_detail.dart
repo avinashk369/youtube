@@ -26,7 +26,6 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
   @override
   void initState() {
     _controller = ScrollController();
-    print(context.read<EmployeeBloc>().name);
     _controller.addListener(() {
       if (_controller.offset > MediaQuery.of(context).size.height * .2 &&
           !_controller.position.outOfRange) {

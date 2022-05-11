@@ -17,8 +17,26 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  late ScrollController scrollController;
+  int page = 1;
+  bool isLoading = false;
+  int limit = 10;
   @override
   void initState() {
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.position.atEdge) {
+        if (scrollController.position.pixels != 0) {
+          BlocProvider.of<EmployeeBloc>(context).add(
+            LoadEmployees(
+              page: page++,
+              limit: limit,
+            ),
+          );
+        }
+      }
+    });
+
     super.initState();
   }
 
@@ -38,6 +56,7 @@ class _HomeState extends State<Home> {
         ),
       ),
       body: CustomScrollView(
+        controller: scrollController,
         slivers: [
           SliverList(
             delegate: SliverChildListDelegate(
@@ -45,19 +64,27 @@ class _HomeState extends State<Home> {
                 BlocBuilder<EmployeeBloc, EmployeeState>(
                   builder: (context, state) {
                     if (state is EmployeeLoaded) {
+                      isLoading = true;
                       return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) => EmployeeCard(
+                          itemBuilder: (context, index) {
+                            if (index < state.employees.length) {
+                              return EmployeeCard(
                                 employeeModel: state.employees[index],
                                 onTap: (employeeModel) {
                                   Navigator.of(context).pushNamed(empDetail,
                                       arguments: employeeModel);
                                 },
-                              ),
-                          itemCount: state.employees.length);
+                              );
+                            } else {
+                              return LoadingUI();
+                            }
+                          },
+                          itemCount:
+                              state.employees.length + (isLoading ? 1 : 0));
                     }
-                    if (state is EmployeeLoading) {
+                    if (state is EmployeeLoading && !isLoading) {
                       return LoadingUI();
                     }
                     if (state is EmployeeError) {
