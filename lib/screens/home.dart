@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youtube/blocs/employee/employeebloc.dart';
+import 'package:youtube/models/employee/employee_model.dart';
 import 'package:youtube/routes/route_constants.dart';
 import 'package:youtube/screens/employee/employee_card.dart';
 import 'package:youtube/screens/loading_ui.dart';
@@ -8,6 +9,7 @@ import 'package:youtube/styles/styles.dart';
 import 'package:youtube/utils/theme_constants.dart';
 
 import 'custom_appbar.dart';
+import 'custom_input.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -18,7 +20,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late ScrollController scrollController;
-
+  TextEditingController search = TextEditingController();
   bool isLoading = false;
   @override
   void initState() {
@@ -52,35 +54,70 @@ class _HomeState extends State<Home> {
         ),
       ),
       body: CustomScrollView(
-        controller: scrollController,
         slivers: [
           SliverList(
             delegate: SliverChildListDelegate(
               [
+                Builder(builder: (context) {
+                  return IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: CustomInput(
+                              textController: search,
+                              hintText: 'Search Employee',
+                              onChanged: (v) {},
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () => search.text.isEmpty
+                              ? null
+                              : context
+                                  .read<EmployeeBloc>()
+                                  .add(LoadEmployees(name: search.text)),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            margin: const EdgeInsets.only(right: 5),
+                            decoration: BoxDecoration(
+                              color: primaryLight,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            child: const Icon(
+                              Icons.search,
+                              color: secondaryLight,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                const SizedBox(
+                  height: 10,
+                ),
                 BlocBuilder<EmployeeBloc, EmployeeState>(
                   builder: (context, state) {
                     if (state is EmployeeLoaded) {
-                      isLoading = true;
                       return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            if (index < state.employees.length) {
-                              return EmployeeCard(
-                                employeeModel: state.employees[index],
-                                onTap: (employeeModel) {
-                                  Navigator.of(context).pushNamed(empDetail,
-                                      arguments: employeeModel);
-                                },
-                              );
-                            } else {
-                              return LoadingUI();
-                            }
+                            return EmployeeCard(
+                              employeeModel: state.employees[index],
+                              onTap: (employeeModel) {
+                                Navigator.of(context).pushNamed(empDetail,
+                                    arguments: employeeModel);
+                              },
+                            );
                           },
-                          itemCount:
-                              state.employees.length + (isLoading ? 1 : 0));
+                          itemCount: state.employees.length);
                     }
-                    if (state is EmployeeLoading && !isLoading) {
+                    if (state is EmployeeLoading) {
                       return LoadingUI();
                     }
                     if (state is EmployeeError) {
@@ -92,7 +129,7 @@ class _HomeState extends State<Home> {
                         ),
                       );
                     }
-                    return const Text("Please wait...");
+                    return const SizedBox.shrink();
                   },
                 )
               ],
