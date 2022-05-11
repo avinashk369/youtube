@@ -6,12 +6,8 @@ abstract class EmployeeEvent extends Equatable {
 }
 
 class LoadEmployees extends EmployeeEvent {
-  final int page;
-  final int limit;
   final String? name;
   const LoadEmployees({
-    required this.page,
-    required this.limit,
     this.name,
   });
   @override

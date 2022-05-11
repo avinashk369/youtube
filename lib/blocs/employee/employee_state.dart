@@ -15,6 +15,15 @@ class EmployeeLoading extends EmployeeState {
   List<Object> get props => [];
 }
 
+class Loading extends EmployeeState {
+  final List<EmployeeModel> employees;
+  const Loading({
+   required this.employees,
+  });
+  @override
+  List<Object> get props => [];
+}
+
 class EmployeeError extends EmployeeState {
   String message;
   EmployeeError({required this.message});

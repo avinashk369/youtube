@@ -12,11 +12,11 @@ class EmployeeRepositoryImpl implements EmployeeRepository {
     dio = Dio();
     //dio.options.headers["Content-Type"] = "application/json";
     //dio.interceptors.add(PrettyDioLogger());
-    dio.interceptors.add(LogInterceptor(
-      //responseBody: true,
-      request: true,
-      //requestBody: true,
-    ));
+    //dio.interceptors.add(LogInterceptor(
+    //responseBody: true,
+    //request: true,
+    //requestBody: true,
+    //));
     apiClient = ApiClient(dio);
   }
 

@@ -44,8 +44,8 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       final state = this.state;
 
       emit(EmployeeLoading());
-      List<EmployeeModel> employees = await _employeeRepositoryImpl
-          .loadEmployees(event.page, event.limit, event.name);
+      List<EmployeeModel> employees =
+          await _employeeRepositoryImpl.loadEmployees(page++, 10, event.name);
       if (state is EmployeeLoaded) {
         emit(
           EmployeeLoaded(

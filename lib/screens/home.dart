@@ -18,9 +18,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late ScrollController scrollController;
-  int page = 1;
+
   bool isLoading = false;
-  int limit = 10;
   @override
   void initState() {
     scrollController = ScrollController();
@@ -28,10 +27,7 @@ class _HomeState extends State<Home> {
       if (scrollController.position.atEdge) {
         if (scrollController.position.pixels != 0) {
           BlocProvider.of<EmployeeBloc>(context).add(
-            LoadEmployees(
-              page: ++page,
-              limit: limit,
-            ),
+            const LoadEmployees(),
           );
         }
       }
@@ -96,7 +92,7 @@ class _HomeState extends State<Home> {
                         ),
                       );
                     }
-                    return const SizedBox.shrink();
+                    return const Text("Please wait...");
                   },
                 )
               ],
