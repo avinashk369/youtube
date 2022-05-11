@@ -29,7 +29,7 @@ class _HomeState extends State<Home> {
         if (scrollController.position.pixels != 0) {
           BlocProvider.of<EmployeeBloc>(context).add(
             LoadEmployees(
-              page: page++,
+              page: ++page,
               limit: limit,
             ),
           );

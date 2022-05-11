@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youtube/repository/employee_repositoryImpl.dart';
 import 'package:youtube/utils/utils.dart';
 
+import 'blocs/bloc_delegate.dart';
 import 'routes/route_constants.dart';
 import 'routes/route_generator.dart';
 import 'styles/custom_theme.dart';
@@ -10,7 +11,10 @@ import 'styles/custom_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Paint.enableDithering = true;
-  runApp(const MyApp());
+  BlocOverrides.runZoned(
+    () => runApp(const MyApp()),
+    blocObserver: SimpleBlocDelegate(),
+  );
 }
 
 class MyApp extends StatelessWidget {
