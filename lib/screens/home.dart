@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youtube/blocs/employee/employeebloc.dart';
-import 'package:youtube/models/employee/employee_model.dart';
 import 'package:youtube/routes/route_constants.dart';
 import 'package:youtube/screens/employee/employee_card.dart';
 import 'package:youtube/screens/loading_ui.dart';
@@ -54,6 +53,7 @@ class _HomeState extends State<Home> {
         ),
       ),
       body: CustomScrollView(
+        controller: scrollController,
         slivers: [
           SliverList(
             delegate: SliverChildListDelegate(
@@ -103,21 +103,25 @@ class _HomeState extends State<Home> {
                 BlocBuilder<EmployeeBloc, EmployeeState>(
                   builder: (context, state) {
                     if (state is EmployeeLoaded) {
+                      isLoading = true;
                       return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            return EmployeeCard(
-                              employeeModel: state.employees[index],
-                              onTap: (employeeModel) {
-                                Navigator.of(context).pushNamed(empDetail,
-                                    arguments: employeeModel);
-                              },
-                            );
-                          },
-                          itemCount: state.employees.length);
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return index >= state.employees.length
+                              ? LoadingUI()
+                              : EmployeeCard(
+                                  employeeModel: state.employees[index],
+                                  onTap: (employeeModel) {
+                                    Navigator.of(context).pushNamed(empDetail,
+                                        arguments: employeeModel);
+                                  },
+                                );
+                        },
+                        itemCount: state.employees.length + (isLoading ? 1 : 0),
+                      );
                     }
-                    if (state is EmployeeLoading) {
+                    if (state is EmployeeInitializing) {
                       return LoadingUI();
                     }
                     if (state is EmployeeError) {

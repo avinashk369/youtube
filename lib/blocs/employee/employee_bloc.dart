@@ -41,10 +41,17 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
   Future _loadEmployees(
       LoadEmployees event, Emitter<EmployeeState> emit) async {
     try {
-      emit(EmployeeLoading());
-      List<EmployeeModel> employees =
-          await _employeeRepositoryImpl.loadEmployees(1, 10, event.name);
-      emit(EmployeeLoaded(employees: employees));
+      final state = this.state;
+      if (state is EmployeeInitializing) {
+        List<EmployeeModel> employees =
+            await _employeeRepositoryImpl.loadEmployees(page, 10, event.name);
+        emit(EmployeeLoaded(employees: employees));
+      }
+      if (state is EmployeeLoaded) {
+        List<EmployeeModel> employees =
+            await _employeeRepositoryImpl.loadEmployees(page++, 10, event.name);
+        emit(EmployeeLoaded(employees: state.employees + employees));
+      }
     } on ServerError catch (e) {
       emit(EmployeeError(message: e.getErrorMessage()));
     } catch (e) {
