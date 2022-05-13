@@ -60,10 +60,12 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
         List<EmployeeModel> employees =
             await _employeeRepositoryImpl.loadEmployees(page++, 10, event.name);
         emit(
-          EmployeeLoaded(
-            employees: state.employees + employees,
-            hasReachedMax: employees.length < 10 ? true : false,
-          ),
+          employees.length < 10
+              ? (state).copyWith(hasReachedMax: true)
+              : EmployeeLoaded(
+                  employees: state.employees + employees,
+                  hasReachedMax: false,
+                ),
         );
       }
     } on ServerError catch (e) {

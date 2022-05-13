@@ -39,6 +39,17 @@ class EmployeeLoaded extends EmployeeState {
     this.hasReachedMax = false,
   });
 
+// this  copy with is used to copy the state and add the new data
+  EmployeeLoaded copyWith({
+    List<EmployeeModel>? employees,
+    bool? hasReachedMax,
+  }) {
+    return EmployeeLoaded(
+      employees: employees ?? this.employees,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+    );
+  }
+
   @override
   List<Object> get props => [employees, hasReachedMax];
 }
