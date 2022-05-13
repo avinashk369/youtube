@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youtube/repository/employee_repositoryImpl.dart';
 import 'package:youtube/utils/utils.dart';
@@ -11,6 +12,15 @@ import 'styles/custom_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Paint.enableDithering = true;
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarBrightness: Brightness.dark,
+    statusBarIconBrightness: Brightness.dark,
+  ));
+  await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   BlocOverrides.runZoned(
     () => runApp(const MyApp()),
     blocObserver: SimpleBlocDelegate(),

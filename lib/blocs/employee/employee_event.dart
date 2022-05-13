@@ -7,8 +7,10 @@ abstract class EmployeeEvent extends Equatable {
 
 class LoadEmployees extends EmployeeEvent {
   final String? name;
+  final bool isSearching;
   const LoadEmployees({
     this.name,
+    this.isSearching = false,
   });
   @override
   List<Object> get props => [];

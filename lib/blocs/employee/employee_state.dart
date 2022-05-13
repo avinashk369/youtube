@@ -33,15 +33,14 @@ class EmployeeError extends EmployeeState {
 
 class EmployeeLoaded extends EmployeeState {
   final List<EmployeeModel> employees;
-
+  final bool hasReachedMax;
   const EmployeeLoaded({
     required this.employees,
+    this.hasReachedMax = false,
   });
 
   @override
-  List<Object> get props => [
-        employees,
-      ];
+  List<Object> get props => [employees, hasReachedMax];
 }
 
 class EmployeeDetailLoaded extends EmployeeState {

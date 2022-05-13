@@ -19,7 +19,7 @@ class NavigationDemo extends StatelessWidget {
           create: (context) => EmployeeBloc(
             context.read<EmployeeRepositoryImpl>(),
           )..add(
-              const LoadEmployees(),
+              const LoadEmployees(isSearching: false),
             ),
         ),
       ],

@@ -19,8 +19,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late ScrollController scrollController;
-  TextEditingController search = TextEditingController();
-  bool isLoading = false;
+
+  bool isSearching = false;
   @override
   void initState() {
     scrollController = ScrollController();
@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
       if (scrollController.position.atEdge) {
         if (scrollController.position.pixels != 0) {
           BlocProvider.of<EmployeeBloc>(context).add(
-            const LoadEmployees(),
+            const LoadEmployees(isSearching: false),
           );
         }
       }
@@ -40,9 +40,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: 'Home',
-      ),
       //added floating action button to apply filter
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryLight,
@@ -52,95 +49,136 @@ class _HomeState extends State<Home> {
           color: secondaryLight,
         ),
       ),
-      body: CustomScrollView(
-        controller: scrollController,
-        slivers: [
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                Builder(builder: (context) {
-                  return IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: CustomInput(
-                              textController: search,
-                              hintText: 'Search Employee',
-                              onChanged: (v) {},
-                            ),
-                          ),
+      body: SafeArea(
+        child: CustomScrollView(
+          controller: scrollController,
+          slivers: [
+            SliverAppBar(
+              expandedHeight: kToolbarHeight * 2,
+              automaticallyImplyLeading: false,
+              floating: true,
+              pinned: true,
+              snap: false,
+              elevation: 0,
+              bottom: SearchBar(
+                onSearch: ((searchText) {
+                  isSearching = true;
+                  context.read<EmployeeBloc>().add(
+                        LoadEmployees(
+                          name: searchText.trim(),
+                          isSearching: isSearching,
                         ),
-                        InkWell(
-                          onTap: () => search.text.isEmpty
-                              ? null
-                              : context
-                                  .read<EmployeeBloc>()
-                                  .add(LoadEmployees(name: search.text)),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            margin: const EdgeInsets.only(right: 5),
-                            decoration: BoxDecoration(
-                              color: primaryLight,
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                            child: const Icon(
-                              Icons.search,
-                              color: secondaryLight,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                      );
                 }),
-                const SizedBox(
-                  height: 10,
-                ),
-                BlocBuilder<EmployeeBloc, EmployeeState>(
-                  builder: (context, state) {
-                    if (state is EmployeeLoaded) {
-                      isLoading = true;
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return index >= state.employees.length
-                              ? LoadingUI()
-                              : EmployeeCard(
-                                  employeeModel: state.employees[index],
-                                  onTap: (employeeModel) {
-                                    Navigator.of(context).pushNamed(empDetail,
-                                        arguments: employeeModel);
-                                  },
-                                );
-                        },
-                        itemCount: state.employees.length + (isLoading ? 1 : 0),
-                      );
-                    }
-                    if (state is EmployeeInitializing) {
-                      return LoadingUI();
-                    }
-                    if (state is EmployeeError) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(
-                          state.message,
-                          style: kLabelStyleBold.copyWith(color: redColor),
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                )
-              ],
+              ),
+              flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.pin,
+                  background: Column(
+                    children: const [
+                      CustomAppBar(
+                        title: 'Home',
+                      ),
+                    ],
+                  )),
             ),
-          ),
-        ],
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  BlocBuilder<EmployeeBloc, EmployeeState>(
+                    builder: (context, state) {
+                      if (state is EmployeeLoaded) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return index >= state.employees.length
+                                ? const LoadingUI()
+                                : EmployeeCard(
+                                    employeeModel: state.employees[index],
+                                    onTap: (employeeModel) {
+                                      Navigator.of(context).pushNamed(empDetail,
+                                          arguments: employeeModel);
+                                    },
+                                  );
+                          },
+                          itemCount: state.employees.length +
+                              (state.hasReachedMax ? 0 : 1),
+                        );
+                      }
+                      if (state is EmployeeInitializing) {
+                        return const LoadingUI();
+                      }
+                      if (state is EmployeeError) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            state.message,
+                            style: kLabelStyleBold.copyWith(color: redColor),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+class SearchBar extends StatelessWidget implements PreferredSizeWidget {
+  final Function(String searchText) onSearch;
+  const SearchBar({
+    Key? key,
+    required this.onSearch,
+  })  : preferredSize = const Size.fromHeight(kAppBarHeight),
+        super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    TextEditingController search = TextEditingController();
+    return Container(
+      height: kToolbarHeight,
+      color: Colors.white,
+      child: Builder(builder: (context) {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: CustomInput(
+                  textController: search,
+                  hintText: 'Search Employee',
+                  onChanged: (v) {},
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () => search.text.isEmpty ? null : onSearch(search.text),
+              child: Container(
+                width: 48,
+                height: 48,
+                margin: const EdgeInsets.only(right: 5),
+                decoration: BoxDecoration(
+                  color: primaryLight,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: const Icon(
+                  Icons.search,
+                  color: secondaryLight,
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  @override
+  final Size preferredSize;
 }

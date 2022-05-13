@@ -42,15 +42,26 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       LoadEmployees event, Emitter<EmployeeState> emit) async {
     try {
       final state = this.state;
+      if (event.isSearching) {
+        List<EmployeeModel> employees =
+            await _employeeRepositoryImpl.loadEmployees(1, 10, event.name);
+        emit(EmployeeLoaded(employees: employees, hasReachedMax: true));
+        return;
+      }
       if (state is EmployeeInitializing) {
         List<EmployeeModel> employees =
             await _employeeRepositoryImpl.loadEmployees(page, 10, event.name);
-        emit(EmployeeLoaded(employees: employees));
+        emit(EmployeeLoaded(employees: employees, hasReachedMax: false));
       }
       if (state is EmployeeLoaded) {
         List<EmployeeModel> employees =
             await _employeeRepositoryImpl.loadEmployees(page++, 10, event.name);
-        emit(EmployeeLoaded(employees: state.employees + employees));
+        emit(
+          EmployeeLoaded(
+            employees: state.employees + employees,
+            hasReachedMax: employees.length < 10 ? true : false,
+          ),
+        );
       }
     } on ServerError catch (e) {
       emit(EmployeeError(message: e.getErrorMessage()));
