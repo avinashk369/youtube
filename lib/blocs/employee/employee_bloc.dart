@@ -42,17 +42,20 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       LoadEmployees event, Emitter<EmployeeState> emit) async {
     try {
       final state = this.state;
+      // load search string data
       if (event.isSearching) {
         List<EmployeeModel> employees =
             await _employeeRepositoryImpl.loadEmployees(1, 10, event.name);
         emit(EmployeeLoaded(employees: employees, hasReachedMax: true));
         return;
       }
+      // load first page data
       if (state is EmployeeInitializing) {
         List<EmployeeModel> employees =
             await _employeeRepositoryImpl.loadEmployees(page, 10, event.name);
         emit(EmployeeLoaded(employees: employees, hasReachedMax: false));
       }
+      // load data as you scroll till you reach end
       if (state is EmployeeLoaded) {
         List<EmployeeModel> employees =
             await _employeeRepositoryImpl.loadEmployees(page++, 10, event.name);
