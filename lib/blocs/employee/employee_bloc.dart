@@ -63,7 +63,7 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
           employees.length < 10
               ? (state).copyWith(hasReachedMax: true)
               : EmployeeLoaded(
-                  employees: state.employees + employees,
+                  employees: [...state.employees, ...employees],
                   hasReachedMax: false,
                 ),
         );

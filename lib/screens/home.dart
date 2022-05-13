@@ -21,20 +21,34 @@ class _HomeState extends State<Home> {
   late ScrollController scrollController;
 
   bool isSearching = false;
+  bool reachedEnd = false;
+
   @override
   void initState() {
-    scrollController = ScrollController();
-    scrollController.addListener(() {
-      if (scrollController.position.atEdge) {
-        if (scrollController.position.pixels != 0) {
-          BlocProvider.of<EmployeeBloc>(context).add(
-            const LoadEmployees(isSearching: false),
-          );
-        }
-      }
-    });
-
     super.initState();
+    scrollController = ScrollController();
+    scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (isScrollAtBottom() && !reachedEnd) {
+      context.read<EmployeeBloc>().add(const LoadEmployees(isSearching: false));
+    }
+  }
+
+  bool isScrollAtBottom() {
+    if (scrollController.position.atEdge) {
+      return scrollController.position.pixels != 0;
+    }
+    return false;
+  }
+
+  @override
+  void dispose() {
+    scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
   }
 
   @override
@@ -87,6 +101,7 @@ class _HomeState extends State<Home> {
                   BlocBuilder<EmployeeBloc, EmployeeState>(
                     builder: (context, state) {
                       if (state is EmployeeLoaded) {
+                        reachedEnd = state.hasReachedMax;
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
