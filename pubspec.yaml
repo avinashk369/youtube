@@ -35,11 +35,11 @@ dev_dependencies:
     sdk: flutter
 
     
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.1
   analyzer: any
   build_runner: any
   json_serializable: ^6.1.1
-  retrofit_generator: ^3.0.1+1
+  retrofit_generator: ^4.0.1
   source_gen: ^1.0.1
 
  
