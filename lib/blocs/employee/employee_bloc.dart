@@ -58,7 +58,7 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       // load data as you scroll till you reach end
       if (state is EmployeeLoaded) {
         List<EmployeeModel> employees =
-            await _employeeRepositoryImpl.loadEmployees(page++, 10, event.name);
+            await _employeeRepositoryImpl.loadEmployees(++page, 10, event.name);
         emit(
           employees.length < 10
               ? (state).copyWith(hasReachedMax: true)
