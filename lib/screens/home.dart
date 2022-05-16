@@ -114,6 +114,11 @@ class _HomeState extends State<Home> {
                                       Navigator.of(context).pushNamed(empDetail,
                                           arguments: employeeModel);
                                     },
+                                    onDelete: (employeModel) {
+                                      context.read<EmployeeBloc>().add(
+                                          DeleteEmployee(
+                                              employeeModel: employeModel));
+                                    },
                                   );
                           },
                           itemCount: state.employees.length +

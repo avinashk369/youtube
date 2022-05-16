@@ -5,10 +5,14 @@ import 'package:youtube/styles/styles.dart';
 
 class EmployeeCard extends StatelessWidget {
   const EmployeeCard(
-      {Key? key, required this.employeeModel, required this.onTap})
+      {Key? key,
+      required this.employeeModel,
+      required this.onTap,
+      required this.onDelete})
       : super(key: key);
   final EmployeeModel employeeModel;
   final Function(EmployeeModel employeeModel) onTap;
+  final Function(EmployeeModel employeeModel) onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +65,13 @@ class EmployeeCard extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(
+                width: 5,
+              ),
+              IconButton(
+                onPressed: () => onDelete(employeeModel),
+                icon: const Icon(Icons.delete),
+              )
             ],
           ),
         ),

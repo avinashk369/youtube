@@ -18,7 +18,26 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
     on<LoadEmployeeDetail>((event, emit) => _loadEmployeeDetail(event, emit));
     on<LoadEmployeeCheckins>(
         (event, emit) => _loadEmployeeCheckins(event, emit));
+    on<DeleteEmployee>((event, emit) => _deleteEmployee(event, emit));
   }
+
+// delete employee
+  Future _deleteEmployee(
+      DeleteEmployee event, Emitter<EmployeeState> emit) async {
+    try {
+      final state = this.state;
+
+      if (state is EmployeeLoaded) {
+        List<EmployeeModel> employees = state.employees
+            .where((emp) => emp.id != event.employeeModel.id)
+            .toList();
+        emit(EmployeeLoaded(employees: employees, hasReachedMax: true));
+      }
+    } catch (e) {
+      emit(EmployeeError(message: e.toString()));
+    }
+  }
+
   int page = 1;
   // load employee checkins
   Future _loadEmployeeCheckins(

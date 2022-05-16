@@ -73,3 +73,10 @@ class EmployeeCheckinsLoaded extends EmployeeState {
   @override
   List<Object> get props => [employeeCheckins];
 }
+
+class EmployeeDeleted extends EmployeeState {
+  final String message;
+  EmployeeDeleted({required this.message});
+  @override
+  List<Object> get props => [];
+}

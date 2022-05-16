@@ -33,3 +33,15 @@ class LoadEmployeeCheckins extends EmployeeEvent {
   @override
   List<Object> get props => [];
 }
+
+// delete employee
+class DeleteEmployee extends EmployeeEvent {
+  final EmployeeModel employeeModel;
+  const DeleteEmployee({
+    required this.employeeModel,
+  });
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+}
